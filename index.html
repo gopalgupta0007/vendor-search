@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Convert Excel to HTML Table using JavaScript</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script src="https://kit.fontawesome.com/47da0f9ac2.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h2 class="text-center mt-4 mb-4" style="font-weight: 900;">Find Venders</h2><br><br>
+    <div class="drag-area">
+        <Label for="excel_file" id="lbl-input-file"><i class="fa-solid fa-upload"></i> Upload</Label><span
+            id="custom-txt"
+            style="font-size: large;font-weight: 700;opacity: .6;position: relative;left: 20px; top: 1px;">No file
+            Choosen yet</span>
+        <input type="file" id="excel_file" value="C:\Users\Gopal gupta\OneDrive\Desktop\pincode\pincode-searcher\newVender2.xlsx" hidden />
+    </div>
+    <br>
+    <div id="content-container" style="display: flex; align-items: center; justify-content: center;">
+        <Label for="search" style="position: relative;top: 5px; right:-35px;"><i
+                class="fa-solid fa-magnifying-glass"></i></Label>
+        <input type="input" name="search" id="search" placeholder="Enter Pincode" style="padding: 5px 10px 5px 50px;"
+            disabled>
+        <button type="submit" onclick="searching(existingVender, NewVender, vender)"
+            style="width: 200px;padding: 4px 10px;">Find Venders</button>
+    </div>
+    <br>
+    <div id="clr-spcifyer">
+        <div id="existing-vender-container" style="display: flex; align-items: center; justify-content: center;">
+            <div id="ev-clr"
+                style="width: 10px;height: 10px;border-radius: 50%;margin:3px;background-color: #00ff4c; border: 1px solid black;">
+            </div>
+            <div><b>Existing Vender</b></div>
+        </div>
+        <div id="new-vender-container" style="display: flex; align-items: center; justify-content: center;">
+            <div id="nv-clr"
+                style="width: 10px;height: 10px;border-radius: 50%;margin:3px;background-color: #00ffff; border: 1px solid black;">
+            </div>
+            <div><b>New Vender</b></div>
+        </div>
+    </div>
+
+    <div id="excel_data" class="mt-5"></div>
+    <script>
+        var NewVender
+        var existingVender
+        var search = document.getElementById("search").value
+        var x = document.getElementById("content-container");
+        x.style.display = "none";
+        // console.log("search => ", search);
+        // console.log("search type => ", typeof search);
+        vender = []
+
+        var uploadedFile = document.getElementById("excel_file");
+        var customTxt = document.getElementById("custom-txt");
+
+        uploadedFile.addEventListener('change', function () {
+            if (uploadedFile.value) {
+                path = uploadedFile.value;
+                console.log(path.split("\\")[path.split("\\").length - 1])
+                customTxt.innerText = path.split("\\")[path.split("\\").length - 1];
+            } else {
+                customTxt.innerText = "&nbsp;&nbsp;No file Choosen yet"
+            }
+        })
+
+        function searching(existingVender, NewVender, vender) {
+            search = document.getElementById("search").value
+            // NewVender=[]
+            // existingVender=[]
+            if (search == null || search == undefined) {
+                searching(existingVender, NewVender, vender)
+                return 0
+            }
+            console.log("search => ", search);
+            console.log("search type => ", typeof search);
+            vender = []
+            existingVender.map(data => {
+                console.log(data);
+                try {
+                    if (data[11].includes(search)) {
+                        vender.push(data)
+                        console.log(data);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            )
+            NewVender.map(data => {
+                console.log(data);
+                try {
+                    if ((data[11].toString()).includes(search)) {
+                        vender.push(data)
+                        console.log(data);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            )
+            console.log("search => ", search);
+
+
+            // vender = searching(existingVender, NewVender, search, vender)
+            if (vender.length > 0) {
+                var accordion;
+                vender.map((e) => {
+                    console.log("working");
+                    accordion += `<button class="accordion" style="background-color:${e[1] == "Existing Vender" ? '#00ff4c' : '#00ffff'}"><div id="add-or-pincode"><b>Pincode : ${e[11]}</b></div><div id="isp-name"><b>ISP Name : ${e[13]}</b></div><div id="isp-phoneNum"><b>ISP Contact no. : <a href="tel:${e[15]}">${e[15]}</a></b></div></button>
+                    <div class="panel">
+                        <p id="venderDetails" style="background-color:${e[1] == "Existing Vender" ? 'rgba(0, 255, 76, .4)' : 'rgba(0, 255, 255, .4)'}">
+                            Vender Status : <b>${e[1] == undefined ? "-" : e[1]}</b><br>
+                            Company Name : <b>${e[2] == undefined ? "-" : e[2]}</b><br>
+                            Business Analysis : <b>${e[3] == undefined ? "-" : e[3]}</b><br>
+                            Circuit ID : <b>${e[4] == undefined ? "-" : e[4]}</b><br>
+                            Sites : <b>${e[5] == undefined ? "-" : e[5]}</b><br>
+                            State : <b>${e[6] == undefined ? "-" : e[6]}</b><br>
+                            Distric : <b>${e[7] == undefined ? "-" : e[7]}</b><br>
+                            City : <b>${e[8] == undefined ? "-" : e[8]}</b><br>
+                            Billing : <b>${e[9] == undefined ? "-" : e[9]}</b><br>
+                            Address : <b>${e[10] == undefined ? "-" : e[10]}</b><br>
+                            Pincode : <b>${e[11] == undefined ? "-" : e[11]}</b><br>
+                            Activation date : <b>${e[12] == undefined ? "-" : e[12]}</b><br>
+                            ISP Name : <b>${e[13] == undefined ? "-" : e[13]}</b><br>
+                            ISP Email ID : <b>${e[14] == undefined ? "-" : e[14]}</b><br>
+                            ISP Contact : <b>${e[15] == undefined ? "-" : e[15]}</b><br>
+                            ISP Alternate No.1 : <b>${e[16] == undefined ? "-" : e[16]}</b><br>
+                            ISP Alternate No.2 : <b>${e[17] == undefined ? "-" : e[17]}</b><br>
+                            Whatsapp No. : <b>${e[18] == undefined ? "-" : e[18]}</b><br>
+                            Plans(In Mbps) : <b>${e[19] == undefined ? "-" : e[19]}</b><br>
+                            Installation Charges : <b>${e[20] == undefined ? "-" : e[20]}</b><br>
+                            Wi-Fi Charges : <b>${e[21] == undefined ? "-" : e[21]}</b><br>
+                            ONU Charges : <b>${e[22] == undefined ? "-" : e[22]}</b><br>
+                            Type of Link : <b>${e[23] == undefined ? "-" : e[23]}</b><br>
+                            Product : <b>${e[24] == undefined ? "-" : e[24]}</b><br>
+                            User ID : <b>${e[25] == undefined ? "-" : e[25]}</b><br>
+                            Password : <b>${e[26] == undefined ? "-" : e[26]}</b><br>
+                            Bandwidth : <b>${e[27] == undefined ? "-" : e[27]}</b><br>
+                            Payment term : <b>${e[28] == undefined ? "-" : e[28]}</b><br>
+                            Account number : <b>${e[29] == undefined ? "-" : e[29]}</b><br>
+                            DSL ID/ Del no. : <b>${e[30] == undefined ? "-" : e[30]}</b><br>
+                            Start Date : <b>${e[31] == undefined ? "-" : e[31]}</b><br>
+                            End Date : <b>${e[32] == undefined ? "-" : e[32]}</b><br>
+                            IP : <b>${e[33] == undefined ? "-" : e[33]}</b><br>
+                        </p>
+                    </div>`
+                })
+                document.getElementById('excel_data').innerHTML = accordion;
+                var acc = document.getElementsByClassName("accordion");
+                var panel = document.getElementsByClassName("panel");
+                var i;
+
+                for (i = 0; i < acc.length; i++) {
+                    //for button
+                    acc[i].addEventListener("mouseenter", function () {
+                        this.classList.toggle("active");
+                        var panel = this.nextElementSibling;
+                        if (panel.style.display === "block") {
+                            panel.style.display = "none";
+                        } else {
+                            panel.style.display = "block";
+                        }
+                    });
+
+                    acc[i].addEventListener("mouseleave", function () {
+                        this.classList.toggle("active");
+                        var panel = this.nextElementSibling;
+                        if (panel.style.display === "none") {
+                            panel.style.display = "block";
+                        } else {
+                            panel.style.display = "none";
+                        }
+                    });
+
+                    // click to action
+                    acc[i].addEventListener("click", function () {
+                        this.classList.toggle("active");
+                        var panel = this.nextElementSibling;
+                        if (panel.style.display === "block") {
+                            panel.style.display = "none";
+                        } else {
+                            panel.style.display = "block";
+                        }
+                    });
+                }
+
+            }
+            // const excel_file = document.getElementById('excel_file');
+        }
+
+        excel_file.addEventListener('change', (event) => {
+
+            if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(event.target.files[0].type)) {
+                document.getElementById('excel_data').innerHTML = '<div class="alert alert-danger">Only .xlsx or .xls file format are allowed</div>';
+
+                excel_file.value = '';
+
+                return false;
+            }
+
+            var reader = new FileReader();
+            console.log("reader => ",reader);
+            reader.readAsArrayBuffer(event.target.files[0]);
+            // console.log("reader => ",reader);
+
+            reader.onload = function (event) {
+                var searchInput = document.getElementById("search").disabled = false;
+                var data = new Uint8Array(reader.result);
+                console.log("data => ", data);
+                var work_book = XLSX.read(data, { type: 'array' });
+                console.log("work_book => ", work_book);
+
+                var sheet_name = work_book.SheetNames;
+                console.log("sheet_name => ", sheet_name);
+
+                NewVender = XLSX.utils.sheet_to_json(work_book.Sheets[sheet_name[0]], { header: 1 });
+                existingVender = XLSX.utils.sheet_to_json(work_book.Sheets[sheet_name[1]], { header: 1 });
+
+                // console.log("existingVender => ", existingVender);
+                console.log("existingVender => ", existingVender);
+                console.log("NewVender => ", NewVender);
+
+                // if file load then show search bar for the vender search
+                var x = document.getElementById("content-container");
+                // x.style.visibility="hidden";
+                // console.log("visibility : "+ x.style.visibility);
+                if (x.style.display === "none") {
+                    x.style.display = "flex";
+                    document.getElementById("search").focus()
+                }
+            };
+        })    
+    </script>
+</body>
+
+</html>
